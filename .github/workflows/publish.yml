@@ -1,0 +1,46 @@
+name: publish
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+    paths:
+      - "src/PhotoGalleryService/**.*"
+      - "src/Boilerplate/**.*"
+jobs:
+  build_service:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: install .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+
+    - name: restore dependencies
+      run: dotnet restore ./src/PhotoGalleryService.sln
+
+    - name: build service
+      run: dotnet build ./src/PhotoGalleryService.sln -c Release --no-restore -o out
+
+    - name: login to docker hub
+      uses: docker/login-action@v1 
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: copy dockerfile
+      run: cp ./src/PhotoGalleryService/Dockerfile ./Dockerfile
+
+    - name: build and publish image
+      id: docker_build
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: loremdonecipsum/photo-gallery-service:alpha
+
+    
