@@ -3,32 +3,35 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace PhotoGalleryService.Features.Gallery.Models
 {
-    public class Album
+    public class Image
         : IModel
     {
-        public Album(string name, string? description)
+        public Image(string name, string description)
         {
             Name = name;
             Description = description;
         }
 
-        public Album(Album album = null)
+        public Image(Image image = null)
         {
-            if(album == null)
+            if (image == null)
             {
                 return;
             }
 
-            AlbumId = album.AlbumId;
-            Name = album.Name;
-            Description = album.Description;
-            IsDeleted = album.IsDeleted;
-            Created = album.Created;
-            Updated = album.Updated;
-            Deleted = album.Deleted;
+            ImageId = image.ImageId;
+            AlbumId = image.AlbumId;
+            Name = image.Name;
+            Description = image.Description;
+            IsDeleted = image.IsDeleted;
+            Created = image.Created;
+            Updated = image.Updated;
+            Deleted = image.Deleted;
         }
 
         [BsonId]
+        public string ImageId { get; set; }
+
         public string AlbumId { get; set; }
 
         public string Name { get; set; }

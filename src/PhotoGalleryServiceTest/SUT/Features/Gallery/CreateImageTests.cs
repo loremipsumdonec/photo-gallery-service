@@ -10,9 +10,9 @@ using Xunit;
 namespace PhotoGalleryServiceTest.SUT.Features.Gallery
 {
     [Collection("PhotoGalleryServiceEngineForSmoke"), Trait("type", "Smoke")]
-    public class CreateAlbumTests
+    public class CreateImageTests
     {
-        public CreateAlbumTests(PhotoGalleryServiceEngineForSmoke engine)
+        public CreateImageTests(PhotoGalleryServiceEngineForSmoke engine)
         {
             Fixture = new GalleryFixture(engine);
         }
@@ -21,9 +21,13 @@ namespace PhotoGalleryServiceTest.SUT.Features.Gallery
 
         [Fact]
         [Trait("severity", "Critical")]
-        public async Task CreateAlbum_WithValidInput_AlbumCreated()
+        public async Task CreateImage_WithValidInput_ImageCreated()
         {
-            var command = new CreateAlbum(
+            Fixture.CreateAlbums(1);
+            var album = Fixture.Albums.First();
+
+            var command = new CreateImage(
+                album.AlbumId,
                 IpsumGenerator.Generate(2, 3, false),
                 IpsumGenerator.Generate(8, 12, false)
             );
@@ -31,22 +35,25 @@ namespace PhotoGalleryServiceTest.SUT.Features.Gallery
             var dispatcher = Fixture.GetService<ICommandDispatcher>();
             await dispatcher.DispatchAsync(command);
 
-            Assert.Single(Fixture.Albums);
+            Assert.Single(Fixture.Images);
 
-            var album = Fixture.Albums.First();
+            var image = Fixture.Images.First();
 
-            Assert.Equal(command.Name, album.Name);
-            Assert.Equal(command.Description, album.Description);
+            Assert.Equal(command.AlbumId, image.AlbumId);
+            Assert.Equal(command.Name, image.Name);
+            Assert.Equal(command.Description, image.Description);
         }
 
         [Fact]
         [Trait("severity", "Critical")]
-        public async Task CreateAlbum_WithSameNameAsOtherAlbum_ThrowsArgumentException()
+        public async Task CreateImage_WithSameNameAsOtherImageInSameAlbum_ThrowsArgumentException()
         {
-            Fixture.CreateAlbums(1);
+            Fixture.CreateAlbums(1)
+                .WithImages(1);
 
-            var command = new CreateAlbum(
-                Fixture.Albums.First().Name,
+            var command = new CreateImage(
+                Fixture.Images.First().AlbumId,
+                Fixture.Images.First().Name,
                 IpsumGenerator.Generate(8, 12, false)
             );
 

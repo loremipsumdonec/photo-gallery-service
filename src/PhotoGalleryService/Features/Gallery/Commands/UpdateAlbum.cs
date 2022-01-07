@@ -11,8 +11,8 @@ namespace PhotoGalleryService.Features.Gallery.Commands
     {
         public UpdateAlbum(
             string albumId,
-            string? name,
-            string? description)
+            string name,
+            string description)
         {
             AlbumId = albumId;
             Name = name;

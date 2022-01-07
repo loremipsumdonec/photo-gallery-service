@@ -55,7 +55,7 @@ namespace PhotoGalleryService.Features.Gallery.Commands
 
         private void ValidateUniqueName(CreateAlbum command)
         {
-            if (_storage.List(0, 1, (template) => template.Name == command.Name).Any())
+            if (_storage.List(0, 1, (album) => album.Name == command.Name).Any())
             {
                 throw new ArgumentException($"album does not have a unique name");
             }

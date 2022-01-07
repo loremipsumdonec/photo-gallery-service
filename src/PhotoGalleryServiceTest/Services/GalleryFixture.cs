@@ -1,6 +1,7 @@
 ﻿using PhotoGalleryService.Features.Gallery.Models;
 using PhotoGalleryService.Features.Gallery.Services;
 using PhotoGalleryServiceTest.Utility;
+using System;
 using System.Collections.Generic;
 
 namespace PhotoGalleryServiceTest.Services
@@ -21,8 +22,8 @@ namespace PhotoGalleryServiceTest.Services
 
         private void Clear()
         {
-            IAlbumStorage storage = GetService<IAlbumStorage>();
-            storage.Clear();
+            GetService<IAlbumStorage>().Clear();
+            GetService<IImageStorage>().Clear();
         }
 
         public T GetService<T>()
@@ -30,7 +31,9 @@ namespace PhotoGalleryServiceTest.Services
             return (T)_engine.Services.GetService(typeof(T));
         }
 
-        public IEnumerable<Album> Gallery
+        #region Albums
+
+        public IEnumerable<Album> Albums
         {
             get
             {
@@ -59,5 +62,45 @@ namespace PhotoGalleryServiceTest.Services
 
             return this;
         }
+
+        #endregion
+
+        #region Images
+
+        public IEnumerable<Image> Images
+        {
+            get
+            {
+                IImageStorage storage = GetService<IImageStorage>();
+                return storage.List(0, 100000);
+            }
+        }
+
+        public Image GetImage(Image image)
+        {
+            IImageStorage storage = GetService<IImageStorage>();
+            return storage.Get(image.ImageId);
+        }
+
+        public GalleryFixture WithImages(int total)
+        {
+            IImageStorage storage = GetService<IImageStorage>();
+
+            foreach(var album in Albums) 
+            {
+                for (int index = 0; index < total; index++)
+                {
+                    storage.Create(image =>
+                    {
+                        image.AlbumId = album.AlbumId;
+                        image.Name = Guid.NewGuid().ToString("N");
+                    });
+                }
+            }
+
+            return this;
+        }
+
+        #endregion
     }
 }

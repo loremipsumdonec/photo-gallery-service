@@ -9,9 +9,9 @@ using Xunit;
 namespace PhotoGalleryServiceTest.SUT.Features.Gallery
 {
     [Collection("PhotoGalleryServiceEngineForSmoke"), Trait("type", "Smoke")]
-    public class DeleteAlbumTests
+    public class DeleteImageTests
     {
-        public DeleteAlbumTests(PhotoGalleryServiceEngineForSmoke engine)
+        public DeleteImageTests(PhotoGalleryServiceEngineForSmoke engine)
         {
             Fixture = new GalleryFixture(engine);
         }
@@ -20,15 +20,15 @@ namespace PhotoGalleryServiceTest.SUT.Features.Gallery
 
         [Fact]
         [Trait("severity", "Critical")]
-        public async Task DeleteAlbum_AlbumExists_AlbumDeleted()
+        public async Task DeleteImage_ImageExists_ImageDeleted()
         {
-            Fixture.CreateAlbums(1);
-            var album = Fixture.Albums.PickRandom();
+            Fixture.CreateAlbums(1).WithImages(1);
+            var image = Fixture.Images.PickRandom();
             var dispatcher = Fixture.GetService<ICommandDispatcher>();
 
-            await dispatcher.DispatchAsync(new DeleteAlbum(album.AlbumId));
+            await dispatcher.DispatchAsync(new DeleteImage(image.ImageId));
 
-            var deleted = Fixture.GetAlbum(album);
+            var deleted = Fixture.GetImage(image);
 
             Assert.True(deleted.IsDeleted);
             Assert.True(deleted.Deleted > DateTime.MinValue);
@@ -36,12 +36,12 @@ namespace PhotoGalleryServiceTest.SUT.Features.Gallery
 
         [Fact]
         [Trait("severity", "Critical")]
-        public void DeleteAlbum_WhenAlbumDoesNotExists_ThrowsException()
+        public void DeleteImage_WhenImageDoesNotExists_ThrowsException()
         {
             var dispatcher = Fixture.GetService<ICommandDispatcher>();
 
             Assert.ThrowsAsync<ArgumentException>(
-                async () => await dispatcher.DispatchAsync(new DeleteAlbum(Guid.NewGuid().ToString()))
+                async () => await dispatcher.DispatchAsync(new DeleteImage(Guid.NewGuid().ToString()))
             );
         }
     }

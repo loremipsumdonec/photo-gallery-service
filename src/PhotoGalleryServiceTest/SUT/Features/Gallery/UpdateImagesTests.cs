@@ -8,9 +8,9 @@ using Xunit;
 namespace PhotoGalleryServiceTest.SUT.Features.Gallery
 {
     [Collection("PhotoGalleryServiceEngineForSmoke"), Trait("type", "Smoke")]
-    public class UpdateAlbumTests
+    public class UpdateImageTests
     {
-        public UpdateAlbumTests(PhotoGalleryServiceEngineForSmoke engine)
+        public UpdateImageTests(PhotoGalleryServiceEngineForSmoke engine)
         {
             Fixture = new GalleryFixture(engine);
         }
@@ -19,12 +19,13 @@ namespace PhotoGalleryServiceTest.SUT.Features.Gallery
 
         [Fact]
         [Trait("severity", "Critical")]
-        public async Task UpdateAlbum_WithValidInput_AlbumUpdated()
+        public async Task UpdateImage_WithValidInput_ImageUpdated()
         {
-            Fixture.CreateAlbums(1);
-            var source = Fixture.Albums.First();
+            Fixture.CreateAlbums(1).WithImages(1);
+            var source = Fixture.Images.First();
 
-            var command = new UpdateAlbum(
+            var command = new UpdateImage(
+                source.ImageId,
                 source.AlbumId,
                 "Updated name",
                 "Updated description"
@@ -33,7 +34,7 @@ namespace PhotoGalleryServiceTest.SUT.Features.Gallery
             var dispatcher = Fixture.GetService<ICommandDispatcher>();
             await dispatcher.DispatchAsync(command);
 
-            var updated = Fixture.GetAlbum(source);
+            var updated = Fixture.GetImage(source);
 
             Assert.Equal(command.Name, updated.Name);
             Assert.Equal(command.Description, updated.Description);
