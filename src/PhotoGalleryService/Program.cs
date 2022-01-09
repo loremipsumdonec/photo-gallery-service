@@ -10,6 +10,7 @@ using Boilerplate.Features.Reactive.Reactive;
 using MassTransit;
 using System.Reflection;
 using Boilerplate.Features.MassTransit;
+using RemotePhotographer.Features.Photographer.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
@@ -34,6 +35,8 @@ builder.Services.AddGraphQLServer()
 
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumer<EventConsumer<ImageCaptured>>();
+
     x.UsingRabbitMq((context, configuration) =>
     {
         configuration.UseTimeout(c => c.Timeout = TimeSpan.FromSeconds(120));

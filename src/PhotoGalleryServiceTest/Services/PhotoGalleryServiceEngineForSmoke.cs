@@ -1,6 +1,5 @@
 ﻿using Boilerplate.Features.RabbitMQ.Services;
 using System.IO;
-using System.Runtime.InteropServices;
 
 namespace PhotoGalleryServiceTest.Services;
 
@@ -19,10 +18,12 @@ public class PhotoGalleryServiceEngineForSmoke
 
         string path = Path.Combine(System.Environment.CurrentDirectory, "smoke");
 
+        /*
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             return new DockerComposeThroughWSLDistributedServiceEngine(path, rabbitMQReadinessProbe);
         }
+        */
 
         return new DockerComposeDistributedServiceEngine(path, rabbitMQReadinessProbe);
     }

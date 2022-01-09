@@ -38,4 +38,19 @@
 	  <Folder Include="SUT\Features\Core\" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="Resources\Images\pexels-francesco-ungaro-2937792.jpg">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Resources\Images\pexels-michal-lizuch-3056573.jpg">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Resources\Images\pexels-sanaan-mazhar-2994163.jpg">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Resources\Images\pexels-stein-egil-liland-3408744.jpg">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 </Project>

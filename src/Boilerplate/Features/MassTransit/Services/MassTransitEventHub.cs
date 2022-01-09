@@ -53,7 +53,7 @@ namespace Boilerplate.Features.MassTransit.Services
 
         private bool IsNotAConsumedEvent(IEvent @event)
         {
-            return true;
+            return @event is not IConsumed;
         }
 
         public void Open()

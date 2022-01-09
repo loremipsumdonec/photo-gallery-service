@@ -1,8 +1,13 @@
-﻿using PhotoGalleryService.Features.Gallery.Models;
+﻿using Boilerplate.Features.Reactive.Events;
+using Boilerplate.Features.Reactive.Services;
+using MassTransit;
+using PhotoGalleryService.Features.Gallery.Models;
 using PhotoGalleryService.Features.Gallery.Services;
 using PhotoGalleryServiceTest.Utility;
 using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
+using System.Threading;
 
 namespace PhotoGalleryServiceTest.Services
 {
@@ -20,15 +25,48 @@ namespace PhotoGalleryServiceTest.Services
             Clear();
         }
 
+        public Resources Resources { get; } = new();
+
         private void Clear()
         {
             GetService<IAlbumStorage>().Clear();
             GetService<IImageStorage>().Clear();
+            GetService<IImageFileStorage>().Clear();
         }
 
         public T GetService<T>()
         {
             return (T)_engine.Services.GetService(typeof(T));
+        }
+
+        public void DistributeEvent(IEvent @event) 
+        {
+            var endpoint = GetService<IPublishEndpoint>();
+            endpoint.Publish(@event, @event.GetType());
+        }
+
+        public IEvent WaitForEvent(Type eventType, int timeout = 5000) 
+        {
+            IEvent @event = null;
+            var set = new ManualResetEventSlim();
+
+            var hub = GetService<IEventHub>();
+            hub.Connect((stream) => 
+                stream.Where(e => e.GetType() == eventType)
+                    .Subscribe(e => {
+                        @event = e;
+                        set.Set();
+                    })
+            );
+
+            set.Wait(timeout);
+
+            if(@event == null) 
+            {
+                throw new TimeoutException($"Timed out when waiting for event {eventType}");
+            }
+
+            return @event;
         }
 
         #region Albums
@@ -96,6 +134,41 @@ namespace PhotoGalleryServiceTest.Services
                         image.Name = Guid.NewGuid().ToString("N");
                     });
                 }
+            }
+
+            return this;
+        }
+
+        #endregion
+
+        #region ImageFiles
+
+        public List<string> GetImageFiles() 
+        {
+            return Resources.Get("Images");
+        }
+
+        public byte[] ReadAllBytesFromRandomImageFile() 
+        {
+            return Resources.ReadAllBytes(
+                GetImageFiles().PickRandom()
+            );
+        }
+
+        public byte[] GetImageFile(Image image) 
+        {
+            IImageFileStorage storage = GetService<IImageFileStorage>();
+            return storage.Download(image.ImageId);
+        }
+
+        public GalleryFixture WithData() 
+        {
+            IImageFileStorage storage = GetService<IImageFileStorage>();
+
+            foreach (var image in Images) 
+            {
+                var randomData = ReadAllBytesFromRandomImageFile();
+                storage.Upload(image.ImageId, randomData);
             }
 
             return this;

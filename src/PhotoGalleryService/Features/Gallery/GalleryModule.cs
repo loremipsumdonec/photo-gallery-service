@@ -27,6 +27,11 @@ namespace PhotoGalleryService.Features.Gallery
                 "gallery.image.storage",
                 Configuration
             ).InstancePerLifetimeScope();
+
+            builder.RegisterFromAs<IImageFileStorage>(
+                "gallery.image.file.storage",
+                Configuration
+            ).InstancePerLifetimeScope();
         }
 
         private void ValidateConfiguration() 
@@ -42,7 +47,12 @@ namespace PhotoGalleryService.Features.Gallery
                 "gallery.image.storage:parameters:username",
                 "gallery.image.storage:parameters:password",
                 "gallery.image.storage:parameters:credentialDatabaseName",
-                "gallery.image.storage:parameters:databaseName"
+                "gallery.image.storage:parameters:databaseName",
+                "gallery.image.file.storage:parameters:hostname",
+                "gallery.image.file.storage:parameters:username",
+                "gallery.image.file.storage:parameters:password",
+                "gallery.image.file.storage:parameters:credentialDatabaseName",
+                "gallery.image.file.storage:parameters:databaseName"
             };
 
             foreach(string key in keys) 
