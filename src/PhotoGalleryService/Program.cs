@@ -1,5 +1,4 @@
 using PhotoGalleryService.Features.Gallery;
-using PhotoGalleryService.Features.Gallery.Events;
 using PhotoGalleryService.Features.Gallery.Schema;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -12,6 +11,7 @@ using System.Reflection;
 using Boilerplate.Features.MassTransit;
 using RemotePhotographer.Features.Photographer.Events;
 using PhotoGalleryService.Features.Worker;
+using MassTransit.MongoDbIntegration.MessageData;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
@@ -48,14 +48,12 @@ builder.Services.AddMassTransit(x =>
     {
         configuration.UseJsonSerializer();
 
-        /*
         configuration.UseMessageData(
             new MongoDbMessageDataRepository(
                 builder.Configuration.GetValue<string>("message.broker-service:parameters:data.repository.connectionString"),
                 builder.Configuration.GetValue<string>("message.broker-service:parameters:data.repository.database")
             )
         );
-        */
 
         configuration.UseTimeout(c => c.Timeout = TimeSpan.FromSeconds(120));
         configuration.Host(
