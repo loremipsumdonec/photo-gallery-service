@@ -1,4 +1,6 @@
-﻿using Boilerplate.Features.Reactive.Events;
+﻿using Autofac;
+using Autofac.Core;
+using Boilerplate.Features.Reactive.Events;
 using Boilerplate.Features.Reactive.Services;
 using MassTransit;
 using PhotoGalleryService.Features.Gallery.Models;
@@ -22,7 +24,7 @@ namespace PhotoGalleryServiceTest.Services
             _engine = engine;
             _engine.Start();
 
-            Clear();
+            //Clear();
         }
 
         public Resources Resources { get; } = new();
@@ -37,6 +39,20 @@ namespace PhotoGalleryServiceTest.Services
         public T GetService<T>()
         {
             return (T)_engine.Services.GetService(typeof(T));
+        }
+
+        public T GetService<T>(params object[] parameters)
+        {
+            var scope = (ILifetimeScope)_engine.Services.GetService(typeof(ILifetimeScope));
+
+            List<Parameter> pp = new List<Parameter>();
+
+            foreach(var parameter in parameters) 
+            {
+                pp.Add(new TypedParameter(parameter.GetType(), parameter));
+            }
+
+            return scope.Resolve<T>(pp);
         }
 
         public void DistributeEvent(IEvent @event) 
@@ -130,7 +146,6 @@ namespace PhotoGalleryServiceTest.Services
                 {
                     storage.Create(image =>
                     {
-                        image.AlbumId = album.AlbumId;
                         image.Name = Guid.NewGuid().ToString("N");
                     });
                 }

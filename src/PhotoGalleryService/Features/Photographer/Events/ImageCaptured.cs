@@ -24,5 +24,7 @@ namespace RemotePhotographer.Features.Photographer.Events
         public string Path { get; set; }
 
         public byte[] Data { get; set; }
+
+        public IEnumerable<string> Tags { get; set; }
     }
 }

@@ -26,7 +26,6 @@ namespace PhotoGalleryServiceTest.SUT.Features.Gallery
 
             var command = new UpdateImage(
                 source.ImageId,
-                source.AlbumId,
                 "Updated name",
                 "Updated description"
             );

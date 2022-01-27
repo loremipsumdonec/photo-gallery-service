@@ -2,8 +2,7 @@
 using Boilerplate.Features.Core.Commands;
 using Boilerplate.Features.Core.Queries;
 using PhotoGalleryService.Features.Gallery.Commands;
-using PhotoGalleryService.Features.Gallery.Models;
-using PhotoGalleryService.Features.Gallery.Queries;
+using PhotoGalleryService.Features.Serve.Queries;
 using RemotePhotographer.Features.Photographer.Events;
 
 namespace PhotoGalleryService.Features.Photographer.Commands
@@ -11,15 +10,33 @@ namespace PhotoGalleryService.Features.Photographer.Commands
     public class SaveImage
         : Command
     {
-        public SaveImage(ImageCaptured @event) 
+        public SaveImage()
         {
-            Path = @event.Path;
-            Data = @event.Data;
         }
 
-        public string Path { get; set; }
+        public SaveImage(ImageCaptured @event) 
+        {
+            Data = @event.Data;
+
+            if(@event.Tags != null) 
+            {
+                Tags = new List<string>(@event.Tags);
+            }
+        }
+
+        public SaveImage(PreviewImageCaptured @event)
+        {
+            Data = @event.Data;
+
+            if (@event.Tags != null)
+            {
+                Tags = new List<string>(@event.Tags);
+            }
+        }
 
         public byte[] Data { get; set; }
+
+        public IEnumerable<string> Tags { get; set; }
     }
 
     [Handle(typeof(SaveImage))]
@@ -27,54 +44,23 @@ namespace PhotoGalleryService.Features.Photographer.Commands
         : CommandHandler<SaveImage>
     {
         private readonly ICommandDispatcher _commandDispatcher;
-        private readonly IQueryDispatcher _queryDispatcher;
 
-        public SaveImageHandler(
-            ICommandDispatcher commandDispatcher, 
-            IQueryDispatcher queryDispatcher
-        )
+        public SaveImageHandler(ICommandDispatcher commandDispatcher)
         {
             _commandDispatcher = commandDispatcher;
-            _queryDispatcher = queryDispatcher;
         }
 
         public override async Task<bool> ExecuteAsync(SaveImage command)
         {
-            var albumId = await GetOrCreateAlbumAsync(command);
-            string imageId = await CreateImageAsync(command, albumId);
+            string imageId = await CreateImageAsync(command);
             await UploadImageFile(command, imageId);
 
             return true;
         }
 
-        private async Task<string> GetOrCreateAlbumAsync(SaveImage command) 
+        private async Task<string> CreateImageAsync(SaveImage command) 
         {
-            string albumName = System.IO.Path.GetDirectoryName(command.Path);
-
-            var album = await _queryDispatcher.DispatchAsync<Album>(
-                new GetAlbum(albumName)
-            );
-
-            if(album != null)
-            {
-                return album.AlbumId;
-            }
-
-            var createAlbum = new CreateAlbum(albumName, string.Empty);
-            await _commandDispatcher.DispatchAsync(createAlbum);
-
-            album = await _queryDispatcher.DispatchAsync<Album>(
-                new GetAlbum((string)createAlbum.CommandResult.Output)
-            );
-
-            return album.AlbumId;
-        }
-    
-        private async Task<string> CreateImageAsync(SaveImage command, string albumId) 
-        {
-            string imageName = System.IO.Path.GetFileName(command.Path);
-
-            var createImage = new CreateImage(albumId, imageName, "");
+            var createImage = new CreateImage(command.Tags);
             await _commandDispatcher.DispatchAsync(createImage);
 
             return (string)createImage.CommandResult.Output;

@@ -20,9 +20,9 @@ namespace PhotoGalleryService.Features.Gallery.Models
             }
 
             ImageId = image.ImageId;
-            AlbumId = image.AlbumId;
             Name = image.Name;
             Description = image.Description;
+            Tags = new List<string>(image.Tags);
             IsDeleted = image.IsDeleted;
             Created = image.Created;
             Updated = image.Updated;
@@ -32,15 +32,15 @@ namespace PhotoGalleryService.Features.Gallery.Models
         [BsonId]
         public string ImageId { get; set; }
 
-        public string AlbumId { get; set; }
-
         public string Name { get; set; }
 
         public string Description { get; set; }
 
+        public IEnumerable<string> Tags { get; set; } = new List<string>();
+
         public bool IsDeleted { get; set; }
 
-        public DateTime Created { get; set; }
+        public DateTime Created { get; set; } = DateTime.Now;
 
         public DateTime Updated { get; set; }
 

@@ -11,7 +11,6 @@ namespace PhotoGalleryService.Features.Gallery.Commands
     {
         public UpdateImage(
             string imageId,
-            string albumId,
             string name,
             string description)
         {
@@ -21,8 +20,6 @@ namespace PhotoGalleryService.Features.Gallery.Commands
         }
 
         public string ImageId { get; set; }
-
-        public string AlbumId { get; set; }
 
         public string Name { get; set; }
 
@@ -50,6 +47,7 @@ namespace PhotoGalleryService.Features.Gallery.Commands
             {
                 image.Name = command.Name;
                 image.Description = command.Description;
+                image.Updated = DateTime.Now;
             });
 
             _dispatcher.Dispatch(new ImageUpdated(image));
@@ -73,7 +71,7 @@ namespace PhotoGalleryService.Features.Gallery.Commands
 
         private void ValidateUniqueName(UpdateImage command)
         {
-            if (_storage.List(0, 1, (image) => image.Name == command.Name && image.AlbumId == command.AlbumId).Any())
+            if (_storage.List(0, 1, (image) => image.Name == command.Name).Any())
             {
                 throw new ArgumentException($"image does not have a unique name");
             }

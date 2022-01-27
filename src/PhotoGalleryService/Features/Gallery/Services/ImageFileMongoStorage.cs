@@ -39,9 +39,19 @@ namespace PhotoGalleryService.Features.Gallery.Services
             _bucket.Drop();
         }
 
-        public string Upload(string imageId, byte[] data) 
+        public string Upload(string imageId, byte[] data, Action<GridFSUploadOptions> build = null) 
         {
-            var id = _bucket.UploadFromBytes(imageId, data);
+            var options = new GridFSUploadOptions()
+            {
+                Metadata = new MongoDB.Bson.BsonDocument()
+            };
+
+            if (build != null)
+            {
+                build.Invoke(options);
+            }
+
+            var id = _bucket.UploadFromBytes(imageId, data, options);
             return id.ToString();
         }
 
@@ -55,6 +65,12 @@ namespace PhotoGalleryService.Features.Gallery.Services
             {
                 return null;
             }
+        }
+
+        public GridFSFileInfo Get(string imageId)
+        {
+            var filter = Builders<GridFSFileInfo>.Filter.Eq(f => f.Filename, imageId);
+            return _bucket.Find(filter).FirstOrDefault();
         }
 
         public void Delete(string imageId) 

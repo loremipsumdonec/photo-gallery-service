@@ -11,6 +11,7 @@ using MassTransit;
 using System.Reflection;
 using Boilerplate.Features.MassTransit;
 using RemotePhotographer.Features.Photographer.Events;
+using PhotoGalleryService.Features.Worker;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
@@ -26,26 +27,45 @@ builder.Host.ConfigureContainer((ContainerBuilder containerBuilder) =>
     containerBuilder.RegisterModule(new ReactiveModule(builder.Configuration, assemblies));
     containerBuilder.RegisterModule(new MassTransitModule(builder.Configuration, assemblies));
     containerBuilder.RegisterModule(new GalleryModule(builder.Configuration));
+    containerBuilder.RegisterModule(new WorkerModule(builder.Configuration, assemblies));
 });
+
+builder.Services.AddControllers();
+builder.Services.AddInMemorySubscriptions();
 
 builder.Services.AddGraphQLServer()
     .AddQueryType<GalleryQuery>()
     .AddMutationType<GalleryMutation>()
+    .AddSubscriptionType<GallerySubscription>()
     .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = true);
 
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<EventConsumer<ImageCaptured>>();
+    x.AddConsumer<EventConsumer<PreviewImageCaptured>>();
 
     x.UsingRabbitMq((context, configuration) =>
     {
-        configuration.UseTimeout(c => c.Timeout = TimeSpan.FromSeconds(120));
+        configuration.UseJsonSerializer();
 
-        configuration.Host(builder.Configuration.GetValue<string>("message.broker-service:parameters:host"), "/", h =>
-        {
-            h.Username(builder.Configuration.GetValue<string>("message.broker-service:parameters:username"));
-            h.Password(builder.Configuration.GetValue<string>("message.broker-service:parameters:password"));
-        });
+        /*
+        configuration.UseMessageData(
+            new MongoDbMessageDataRepository(
+                builder.Configuration.GetValue<string>("message.broker-service:parameters:data.repository.connectionString"),
+                builder.Configuration.GetValue<string>("message.broker-service:parameters:data.repository.database")
+            )
+        );
+        */
+
+        configuration.UseTimeout(c => c.Timeout = TimeSpan.FromSeconds(120));
+        configuration.Host(
+            builder.Configuration.GetValue<string>("message.broker-service:parameters:host"),
+            builder.Configuration.GetValue<ushort>("message.broker-service:parameters:port"),
+             "/", h =>
+             {
+                 h.Username(builder.Configuration.GetValue<string>("message.broker-service:parameters:username"));
+                 h.Password(builder.Configuration.GetValue<string>("message.broker-service:parameters:password"));
+             });
 
         configuration.ReceiveEndpoint(builder.Configuration.GetValue<string>("message.broker-service:parameters:receive.endpoint"), e =>
         {
@@ -58,13 +78,15 @@ builder.Services.AddGenericRequestClient();
 
 var app = builder.Build();
 app.UseRouting();
+app.UseWebSockets();
 
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapGraphQL();
+    endpoints.MapControllers();
 });
 
-app.MapGet("/", () => "Hello PhotoGalleryService!");
+app.MapGet("/", () => "photo gallery service");
 
 app.Run();
 

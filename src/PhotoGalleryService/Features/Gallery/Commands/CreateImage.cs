@@ -9,18 +9,24 @@ namespace PhotoGalleryService.Features.Gallery.Commands
     public class CreateImage
         : Command
     {
-        public CreateImage(string albumId, string name, string description)
+        public CreateImage(IEnumerable<string> tags)
         {
-            AlbumId = albumId;
-            Name = name;
-            Description = description;
+            Name = Guid.NewGuid().ToString("N");
+            Tags = new List<string>(tags);
         }
 
-        public string AlbumId { get; set; }
+        public CreateImage(string name, string description, IEnumerable<string> tags)
+        {
+            Name = name;
+            Description = description;
+            Tags = new List<string>(tags);
+        }
 
         public string Name { get; set; } = string.Empty;
 
         public string Description { get; set; }
+
+        public IEnumerable<string> Tags { get; set; }
     }
 
     [Handle(typeof(CreateImage))]
@@ -42,9 +48,9 @@ namespace PhotoGalleryService.Features.Gallery.Commands
 
             var image = _storage.Create(image =>
             {
-                image.AlbumId = command.AlbumId;
                 image.Name = command.Name;
                 image.Description = command.Description;
+                image.Tags = new List<string>(command.Tags);
             });
 
             _dispatcher.Dispatch(new ImageCreated(image));
@@ -59,9 +65,9 @@ namespace PhotoGalleryService.Features.Gallery.Commands
 
         private void ValidateUniqueName(CreateImage command)
         {
-            if (_storage.List(0, 1, (image) => image.Name == command.Name && image.AlbumId == command.AlbumId ).Any())
+            if (_storage.List(0, 1, (image) => image.Name == command.Name).Any())
             {
-                throw new ArgumentException($"image does not have a unique name in the current album");
+                throw new ArgumentException($"image does not have a unique name");
             }
         }
     }

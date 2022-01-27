@@ -26,9 +26,23 @@ namespace PhotoGalleryService.Features.Photographer.Events
                 .Concat()
                 .Subscribe()
             );
+
+            Disposables.Add(
+                stream.Where(e => e is PreviewImageCaptured)
+                .Select(e => (PreviewImageCaptured)e)
+                .Select(e => Observable.FromAsync(async () => await OnPreviewImageCaptured(e)))
+                .Concat()
+                .Subscribe()
+            );
         }
 
         public Task OnImageCaptured(ImageCaptured @event) 
+        {
+            var dispatcher = _scope.Resolve<ICommandDispatcher>();
+            return dispatcher.DispatchAsync(new SaveImage(@event));
+        }
+
+        public Task OnPreviewImageCaptured(PreviewImageCaptured @event)
         {
             var dispatcher = _scope.Resolve<ICommandDispatcher>();
             return dispatcher.DispatchAsync(new SaveImage(@event));

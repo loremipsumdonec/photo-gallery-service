@@ -24,12 +24,11 @@ namespace PhotoGalleryServiceTest.SUT.Features.Gallery
         public async Task CreateImage_WithValidInput_ImageCreated()
         {
             Fixture.CreateAlbums(1);
-            var album = Fixture.Albums.First();
 
             var command = new CreateImage(
-                album.AlbumId,
                 IpsumGenerator.Generate(2, 3, false),
-                IpsumGenerator.Generate(8, 12, false)
+                IpsumGenerator.Generate(5, 6, false),
+                new string[] { "A", "B", "C"}
             );
 
             var dispatcher = Fixture.GetService<ICommandDispatcher>();
@@ -39,9 +38,9 @@ namespace PhotoGalleryServiceTest.SUT.Features.Gallery
 
             var image = Fixture.Images.First();
 
-            Assert.Equal(command.AlbumId, image.AlbumId);
             Assert.Equal(command.Name, image.Name);
             Assert.Equal(command.Description, image.Description);
+            Assert.Equal(command.Tags, image.Tags);
         }
 
         [Fact]
@@ -52,9 +51,9 @@ namespace PhotoGalleryServiceTest.SUT.Features.Gallery
                 .WithImages(1);
 
             var command = new CreateImage(
-                Fixture.Images.First().AlbumId,
                 Fixture.Images.First().Name,
-                IpsumGenerator.Generate(8, 12, false)
+                Fixture.Images.First().Description,
+                Fixture.Images.First().Tags
             );
 
             var dispatcher = Fixture.GetService<ICommandDispatcher>();

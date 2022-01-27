@@ -17,5 +17,10 @@ namespace PhotoGalleryService.Features.Gallery.Schema
         {
             return dispatcher.DispatchAsync<GetAlbumsModel>(new GetAlbums(offset, fetch));
         }
+
+        public Task<GetImagesModel> Images(int offset, int fetch, [Service] IQueryDispatcher dispatcher) 
+        {
+            return dispatcher.DispatchAsync<GetImagesModel>(new GetImages(offset, fetch));
+        }
     }
 }
