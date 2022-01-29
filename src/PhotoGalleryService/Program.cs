@@ -12,6 +12,7 @@ using Boilerplate.Features.MassTransit;
 using RemotePhotographer.Features.Photographer.Events;
 using PhotoGalleryService.Features.Worker;
 using MassTransit.MongoDbIntegration.MessageData;
+using PhotoGalleryService.Features.Gallery.Queries;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
@@ -43,6 +44,8 @@ builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<EventConsumer<ImageCaptured>>();
     x.AddConsumer<EventConsumer<PreviewImageCaptured>>();
+
+    x.AddConsumer<QueryConsumer<GetImages>>();
 
     x.UsingRabbitMq((context, configuration) =>
     {
