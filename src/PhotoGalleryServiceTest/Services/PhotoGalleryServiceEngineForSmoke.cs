@@ -1,5 +1,5 @@
 ﻿using Boilerplate.Features.RabbitMQ.Services;
-using System.IO;
+using Boilerplate.Features.Testing.Services;
 
 namespace PhotoGalleryServiceTest.Services;
 
@@ -14,18 +14,16 @@ public class PhotoGalleryServiceEngineForSmoke
     protected override DistributedServiceEngine CreateDistributedServiceEngine()
     {
         var configuration = GetConfiguration();
-        var rabbitMQReadinessProbe = new RabbitMQReadinessProbe(configuration.GetSection("message.broker-service:parameters"));
+        string @namespace = configuration.GetSection("kubernetes:namespace").Value;
 
-        string path = Path.Combine(System.Environment.CurrentDirectory, "smoke");
+        var composite = new CompositeReadinessProbe();
+        composite.Add(new RabbitMQReadinessProbe(configuration.GetSection("message.broker-service:parameters")));
 
-        /*
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            return new DockerComposeThroughWSLDistributedServiceEngine(path, rabbitMQReadinessProbe);
-        }
-        */
-
-        return new DockerComposeDistributedServiceEngine(path, rabbitMQReadinessProbe);
+        return new KubernetesDistributedServiceEngine(
+            System.IO.Directory.GetCurrentDirectory(), 
+            @namespace, 
+            composite
+        );
     }
 }
 

@@ -33,7 +33,6 @@ namespace PhotoGalleryServiceTest.SUT.Features.Photographer
             Fixture.DistributeEvent(@event);
             Fixture.WaitForEvent(typeof(ImageFileUploaded));
 
-            Assert.Single(Fixture.Albums);
             Assert.Single(Fixture.Images);
             Assert.Equal(@event.Data, Fixture.GetImageFile(Fixture.Images.First()));
         }

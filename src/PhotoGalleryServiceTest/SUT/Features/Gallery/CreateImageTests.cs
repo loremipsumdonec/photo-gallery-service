@@ -23,8 +23,6 @@ namespace PhotoGalleryServiceTest.SUT.Features.Gallery
         [Trait("severity", "Critical")]
         public async Task CreateImage_WithValidInput_ImageCreated()
         {
-            Fixture.CreateAlbums(1);
-
             var command = new CreateImage(
                 IpsumGenerator.Generate(2, 3, false),
                 IpsumGenerator.Generate(5, 6, false),
@@ -47,8 +45,7 @@ namespace PhotoGalleryServiceTest.SUT.Features.Gallery
         [Trait("severity", "Critical")]
         public async Task CreateImage_WithSameNameAsOtherImageInSameAlbum_ThrowsArgumentException()
         {
-            Fixture.CreateAlbums(1)
-                .WithImages(1);
+            Fixture.CreateImages(1);
 
             var command = new CreateImage(
                 Fixture.Images.First().Name,

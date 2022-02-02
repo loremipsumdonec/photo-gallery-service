@@ -22,7 +22,7 @@ namespace PhotoGalleryServiceTest.SUT.Features.Gallery
         [Trait("severity", "Critical")]
         public async Task DeleteImage_ImageExists_ImageDeleted()
         {
-            Fixture.CreateAlbums(1).WithImages(1);
+            Fixture.CreateImages(1);
             var image = Fixture.Images.PickRandom();
             var dispatcher = Fixture.GetService<ICommandDispatcher>();
 

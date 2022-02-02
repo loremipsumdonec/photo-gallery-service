@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
@@ -29,12 +29,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="..\..\docker\**">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
-
-	<ItemGroup>
 	  <Folder Include="SUT\Features\Core\" />
 	</ItemGroup>
 
@@ -51,6 +45,12 @@
 	  <None Update="Resources\Images\pexels-stein-egil-liland-3408744.jpg">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\kubernetes\**">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 </Project>

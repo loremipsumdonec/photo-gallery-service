@@ -24,14 +24,13 @@ namespace PhotoGalleryServiceTest.Services
             _engine = engine;
             _engine.Start();
 
-            //Clear();
+            Clear();
         }
 
         public Resources Resources { get; } = new();
 
         private void Clear()
         {
-            GetService<IAlbumStorage>().Clear();
             GetService<IImageStorage>().Clear();
             GetService<IImageFileStorage>().Clear();
         }
@@ -57,11 +56,13 @@ namespace PhotoGalleryServiceTest.Services
 
         public void DistributeEvent(IEvent @event) 
         {
+            var dispatcher = GetService<IEventDispatcher>();
+
             var endpoint = GetService<IPublishEndpoint>();
             endpoint.Publish(@event, @event.GetType());
         }
 
-        public IEvent WaitForEvent(Type eventType, int timeout = 5000) 
+        public IEvent WaitForEvent(Type eventType, int timeout = 25000) 
         {
             IEvent @event = null;
             var set = new ManualResetEventSlim();
@@ -85,40 +86,6 @@ namespace PhotoGalleryServiceTest.Services
             return @event;
         }
 
-        #region Albums
-
-        public IEnumerable<Album> Albums
-        {
-            get
-            {
-                IAlbumStorage storage = GetService<IAlbumStorage>();
-                return storage.List(0, 100000);
-            }
-        }
-
-        public Album GetAlbum(Album template)
-        {
-            IAlbumStorage storage = GetService<IAlbumStorage>();
-            return storage.Get(template.AlbumId);
-        }
-
-        public GalleryFixture CreateAlbums(int total)
-        {
-            IAlbumStorage storage = GetService<IAlbumStorage>();
-
-            for (int index = 0; index < total; index++)
-            {
-                storage.Create(template =>
-                {
-                    template.Name = IpsumGenerator.Generate(2, 5, false);
-                });
-            }
-
-            return this;
-        }
-
-        #endregion
-
         #region Images
 
         public IEnumerable<Image> Images
@@ -136,19 +103,17 @@ namespace PhotoGalleryServiceTest.Services
             return storage.Get(image.ImageId);
         }
 
-        public GalleryFixture WithImages(int total)
+        public GalleryFixture CreateImages(int total, params string[] tags)
         {
             IImageStorage storage = GetService<IImageStorage>();
 
-            foreach(var album in Albums) 
+            for (int index = 0; index < total; index++)
             {
-                for (int index = 0; index < total; index++)
+                storage.Create(image =>
                 {
-                    storage.Create(image =>
-                    {
-                        image.Name = Guid.NewGuid().ToString("N");
-                    });
-                }
+                    image.Name = Guid.NewGuid().ToString("N");
+                    image.Add(tags);
+                });
             }
 
             return this;
@@ -180,8 +145,11 @@ namespace PhotoGalleryServiceTest.Services
         {
             IImageFileStorage storage = GetService<IImageFileStorage>();
 
-            foreach (var image in Images) 
+            List<Image> images = new List<Image>(Images);
+
+            for(int index = 0; index < images.Count; index++) 
             {
+                var image = images[index];
                 var randomData = ReadAllBytesFromRandomImageFile();
                 storage.Upload(image.ImageId, randomData);
             }

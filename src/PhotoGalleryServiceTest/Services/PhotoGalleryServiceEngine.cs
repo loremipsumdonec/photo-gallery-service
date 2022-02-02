@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace PhotoGalleryServiceTest.Services;
 
@@ -11,13 +12,18 @@ public abstract class PhotoGalleryServiceEngine
     : WebApplicationFactory<Program>
 {
     private readonly DistributedServiceEngine _distributedServiceEngine;
+    private bool _startFailed;
 
     public PhotoGalleryServiceEngine() 
     {
-        _distributedServiceEngine = CreateDistributedServiceEngine();
     }
 
     public bool ForExploratory { get; set; }
+
+    public override ValueTask DisposeAsync()
+    {
+        return base.DisposeAsync();
+    }
 
     protected override void Dispose(bool disposing)
     {
@@ -33,6 +39,11 @@ public abstract class PhotoGalleryServiceEngine
 
     public virtual void Start()
     {
+        if(_startFailed) 
+        {
+            throw new InvalidOperationException("Failed start application");
+        }
+
         if (Started)
         {
             if(ForExploratory)
@@ -43,10 +54,18 @@ public abstract class PhotoGalleryServiceEngine
             return;
         }
 
-        //StartDistributedService();
-        Services.GetService(typeof(ICommandDispatcher));
+        try
+        {
+            StartDistributedService();
+            Services.GetService(typeof(ICommandDispatcher));
 
-        Started = true;
+            Started = true;
+        }
+        catch 
+        {
+            _startFailed = true;
+            throw;
+        }
     }
 
     public virtual void Stop() 
@@ -56,7 +75,7 @@ public abstract class PhotoGalleryServiceEngine
             return;
         }
 
-        //StopDistributedService();
+        StopDistributedService();
         Started = false;
     }
 
@@ -67,6 +86,11 @@ public abstract class PhotoGalleryServiceEngine
 
     public virtual void StartDistributedService()
     {
+        if(_distributedServiceEngine == null)
+        {
+            return;
+        }
+
         _distributedServiceEngine.StartAsync()
             .GetAwaiter()
             .GetResult();
@@ -74,6 +98,11 @@ public abstract class PhotoGalleryServiceEngine
 
     public virtual void StopDistributedService()
     {
+        if (_distributedServiceEngine == null)
+        {
+            return;
+        }
+
         _distributedServiceEngine.StopAsync()
             .GetAwaiter()
             .GetResult();

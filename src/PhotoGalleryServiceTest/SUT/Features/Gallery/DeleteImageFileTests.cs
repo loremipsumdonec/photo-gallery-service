@@ -24,8 +24,7 @@ namespace PhotoGalleryServiceTest.SUT.Features.Gallery
         [Trait("severity", "Critical")]
         public async Task DeleteImageFile_WhenImageFileExists_FileDeleted() 
         {
-            Fixture.CreateAlbums(1)
-                .WithImages(1)
+            Fixture.CreateImages(1)
                 .WithData();
 
             var image = Fixture.Images.First();

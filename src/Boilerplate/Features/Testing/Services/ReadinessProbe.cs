@@ -1,21 +1,19 @@
-﻿using System.Diagnostics;
-using System.Text;
-
+﻿
 namespace Boilerplate.Features.Testing.Services
 {
     public abstract class ReadinessProbe
         : IReadinessProbe
     {
-        private readonly int _timeoutInSeconds;
+        private readonly int _retries;
 
         public ReadinessProbe()
-            : this(60)
+            : this(10)
         {
         }
 
-        public ReadinessProbe(int timeoutInSeconds) 
+        public ReadinessProbe(int retries) 
         {
-            _timeoutInSeconds = timeoutInSeconds;
+            _retries = retries;
         }
 
         public async Task WaitAsync()
@@ -26,9 +24,9 @@ namespace Boilerplate.Features.Testing.Services
             {
                 await Task.Delay(1000);
 
-                if (tick++ > _timeoutInSeconds)
+                if (tick++ > _retries)
                 {
-                    throw new TimeoutException("Start timedout");
+                    throw new TimeoutException("Readiness check timeout");
                 }
             }
         }

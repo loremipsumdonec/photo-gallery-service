@@ -21,7 +21,7 @@ namespace PhotoGalleryServiceTest.SUT.Features.Gallery
         [Trait("severity", "Critical")]
         public async Task UpdateImage_WithValidInput_ImageUpdated()
         {
-            Fixture.CreateAlbums(1).WithImages(1);
+            Fixture.CreateImages(1);
             var source = Fixture.Images.First();
 
             var command = new UpdateImage(

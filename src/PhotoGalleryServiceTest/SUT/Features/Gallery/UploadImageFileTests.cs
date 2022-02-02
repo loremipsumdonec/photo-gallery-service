@@ -21,7 +21,7 @@ namespace PhotoGalleryServiceTest.SUT.Features.Gallery
         [Trait("severity", "Critical")]
         public async Task UploadImageFile_WithValidFile_FileUploaded() 
         {
-            Fixture.CreateAlbums(1).WithImages(1);
+            Fixture.CreateImages(1);
 
             var image = Fixture.Images.First();
             byte[] expectedData = Fixture.ReadAllBytesFromRandomImageFile();
