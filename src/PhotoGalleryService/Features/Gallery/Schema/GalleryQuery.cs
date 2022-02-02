@@ -1,26 +1,17 @@
-﻿using PhotoGalleryService.Features.Gallery.Models;
-using PhotoGalleryService.Features.Gallery.Queries;
+﻿using PhotoGalleryService.Features.Gallery.Queries;
 using Boilerplate.Features.Core.Queries;
 
 namespace PhotoGalleryService.Features.Gallery.Schema
 {
     public class GalleryQuery
     {
-        public Task<Album> Album(string albumId, [Service] IQueryDispatcher dispatcher) 
+        public Task<GetImagesModel> Images(
+            int offset, 
+            int fetch, 
+            [Service] IQueryDispatcher dispatcher, 
+            IEnumerable<string> tags = null) 
         {
-            return dispatcher.DispatchAsync<Album>(
-                new GetAlbum(albumId)
-            );
-        }
-
-        public Task<GetAlbumsModel> Albums(int offset, int fetch, [Service] IQueryDispatcher dispatcher)
-        {
-            return dispatcher.DispatchAsync<GetAlbumsModel>(new GetAlbums(offset, fetch));
-        }
-
-        public Task<GetImagesModel> Images(int offset, int fetch, [Service] IQueryDispatcher dispatcher) 
-        {
-            return dispatcher.DispatchAsync<GetImagesModel>(new GetImages(offset, fetch));
+            return dispatcher.DispatchAsync<GetImagesModel>(new GetImages(offset, fetch, tags));
         }
     }
 }

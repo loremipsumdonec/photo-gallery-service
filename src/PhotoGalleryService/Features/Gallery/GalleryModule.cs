@@ -5,7 +5,7 @@ using Boilerplate.Features.Core.Config;
 namespace PhotoGalleryService.Features.Gallery
 {
     public class GalleryModule
-            : Autofac.Module
+        : Autofac.Module
     {
         public GalleryModule(IConfiguration configuration)
         {
@@ -17,11 +17,6 @@ namespace PhotoGalleryService.Features.Gallery
         protected override void Load(ContainerBuilder builder)
         {
             ValidateConfiguration();
-
-            builder.RegisterFromAs<IAlbumStorage>(
-                "gallery.album.storage",
-                Configuration
-            ).InstancePerLifetimeScope();
 
             builder.RegisterFromAs<IImageStorage>(
                 "gallery.image.storage",
@@ -38,21 +33,11 @@ namespace PhotoGalleryService.Features.Gallery
         {
             IEnumerable<string> keys = new List<string>()
             {
-                "gallery.album.storage:parameters:hostname",
-                "gallery.album.storage:parameters:username",
-                "gallery.album.storage:parameters:password",
-                "gallery.album.storage:parameters:credentialDatabaseName",
-                "gallery.album.storage:parameters:databaseName",
                 "gallery.image.storage:parameters:hostname",
                 "gallery.image.storage:parameters:username",
                 "gallery.image.storage:parameters:password",
                 "gallery.image.storage:parameters:credentialDatabaseName",
-                "gallery.image.storage:parameters:databaseName",
-                "gallery.image.file.storage:parameters:hostname",
-                "gallery.image.file.storage:parameters:username",
-                "gallery.image.file.storage:parameters:password",
-                "gallery.image.file.storage:parameters:credentialDatabaseName",
-                "gallery.image.file.storage:parameters:databaseName"
+                "gallery.image.storage:parameters:databaseName"
             };
 
             foreach(string key in keys) 

@@ -25,6 +25,6 @@ namespace RemotePhotographer.Features.Photographer.Events
 
         public byte[] Data { get; set; }
 
-        public IEnumerable<string> Tags { get; set; }
+        public IEnumerable<string> Tags { get; set; } = new List<string>();
     }
 }

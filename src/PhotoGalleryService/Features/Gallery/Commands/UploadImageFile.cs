@@ -57,12 +57,7 @@ namespace PhotoGalleryService.Features.Gallery.Commands
                 new Identify(command.Data)
             );
 
-            _fileStorage.Upload(image.ImageId, command.Data, options =>
-            {
-                options.Metadata.Add("mime-type", metaData.MIMEType);
-                options.Metadata.Add("width", metaData.Width);
-                options.Metadata.Add("height", metaData.Width);
-            });
+            _fileStorage.Upload(image.ImageId, command.Data);
 
             _dispatcher.Dispatch(new ImageFileUploaded(image));
 

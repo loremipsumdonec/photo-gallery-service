@@ -42,6 +42,11 @@ namespace PhotoGalleryService.Features.Worker.Services
         {
             List<IInstruction> actions = new List<IInstruction>();
 
+            if(string.IsNullOrEmpty(instructions))
+            {
+                return actions;
+            }
+
             foreach(string instruction in instructions.Split(_instructionsSeperator)) 
             {
                 var name = GetName(instruction);

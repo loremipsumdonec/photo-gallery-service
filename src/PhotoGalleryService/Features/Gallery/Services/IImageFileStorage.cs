@@ -1,14 +1,11 @@
-﻿using MongoDB.Driver.GridFS;
-
+﻿
 namespace PhotoGalleryService.Features.Gallery.Services
 {
     public interface IImageFileStorage
     {
         void Clear();
 
-        GridFSFileInfo Get(string imageId);
-
-        string Upload(string imageId, byte[] data, Action<GridFSUploadOptions> build = null);
+        void Upload(string imageId, byte[] data);
 
         byte[] Download(string imageId);
 

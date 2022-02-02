@@ -38,6 +38,16 @@ namespace PhotoGalleryService.Features.Gallery.Models
 
         public IEnumerable<string> Tags { get; set; } = new List<string>();
 
+        public void Add(IEnumerable<string> tags) 
+        {
+            if(tags == null)
+            {
+                return;
+            }
+
+            ((List<string>)Tags).AddRange(tags);
+        }
+
         public bool IsDeleted { get; set; }
 
         public DateTime Created { get; set; } = DateTime.Now;

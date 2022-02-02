@@ -36,7 +36,6 @@ builder.Services.AddInMemorySubscriptions();
 
 builder.Services.AddGraphQLServer()
     .AddQueryType<GalleryQuery>()
-    .AddMutationType<GalleryMutation>()
     .AddSubscriptionType<GallerySubscription>()
     .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = true);
 
