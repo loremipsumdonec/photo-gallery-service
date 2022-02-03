@@ -33,6 +33,14 @@ namespace PhotoGalleryService.Features.Gallery.Queries
 
         public int Fetch { get; set; }
 
+        public int Count 
+        {  
+            get 
+            {
+                return Images.Count;
+            } 
+        }
+
         public List<Image> Images { get; set; } = new();
 
         public void Add(Image image)
