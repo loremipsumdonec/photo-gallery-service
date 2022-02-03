@@ -8,23 +8,42 @@ on:
       - "src/PhotoGalleryService/**.*"
       - "src/Boilerplate/**.*"
 jobs:
-  build_service:
 
+  linux_arm:
+    uses: loremipsumdonec/photo-gallery-service/.github/workflows/build.yml@master
+    with:
+      configuration: Release
+      architecture: arm
+      platform: linux/arm
+    secrets:
+      dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
+      dockerhub_password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  linux_arm64:
+    uses: loremipsumdonec/photo-gallery-service/.github/workflows/build.yml@master
+    with:
+      configuration: Release
+      architecture: arm64
+      platform: linux/arm64
+    secrets:
+      dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
+      dockerhub_password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  linux_x64:
+    uses: loremipsumdonec/photo-gallery-service/.github/workflows/build.yml@master
+    with:
+      configuration: Release
+      architecture: x64
+      platform: linux/amd64
+    secrets:
+      dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
+      dockerhub_password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  manifest:
+    needs: [linux_arm, linux_arm64, linux_x64]
     runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: install .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 6.0.x
-
-    - name: restore dependencies
-      run: dotnet restore ./src/PhotoGalleryService.sln
-
-    - name: build service
-      run: dotnet build ./src/PhotoGalleryService.sln -c Release --no-restore -o out
+    steps: 
 
     - name: login to docker hub
       uses: docker/login-action@v1 
@@ -32,15 +51,7 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: copy dockerfile
-      run: cp ./src/PhotoGalleryService/Dockerfile ./Dockerfile
-
-    - name: build and publish image
-      id: docker_build
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        push: true
-        tags: loremdonecipsum/photo-gallery-service:alpha
-
-    
+    - name: build manifest
+      run: | 
+        docker manifest create loremdonecipsum/photo-gallery-service:alpha --amend loremdonecipsum/photo-gallery-service:x64-alpha --amend loremdonecipsum/photo-gallery-service:arm64-alpha --amend loremdonecipsum/photo-gallery-service:arm-alpha
+        docker manifest push loremdonecipsum/photo-gallery-service:alpha
