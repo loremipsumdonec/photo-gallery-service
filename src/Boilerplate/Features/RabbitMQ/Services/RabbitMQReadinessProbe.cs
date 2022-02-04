@@ -53,8 +53,6 @@ namespace Boilerplate.Features.RabbitMQ.Services
             {
                 return Task.FromResult(true);
             }
-
-            return Task.FromResult(false);
         }
     }
 }

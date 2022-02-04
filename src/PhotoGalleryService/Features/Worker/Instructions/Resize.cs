@@ -1,5 +1,6 @@
-﻿using ImageMagick;
-using PhotoGalleryService.Features.Worker.Attributes;
+﻿using PhotoGalleryService.Features.Worker.Attributes;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace PhotoGalleryService.Features.Worker.Instructions
 {
@@ -16,9 +17,14 @@ namespace PhotoGalleryService.Features.Worker.Instructions
             _height = height;
         }
 
-        protected override void ApplySynchronously(MagickImage image)
+        protected override void ApplySynchronously(Image image)
         {
-            image.Resize(_width, _height);
+            var options = new ResizeOptions()
+            {
+                Size = new Size(_width, _height)
+            };
+
+            image.Mutate(i => i.Resize(options));
         }
     }
 }

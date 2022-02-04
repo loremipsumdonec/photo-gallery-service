@@ -1,7 +1,8 @@
 ﻿using Boilerplate.Features.Core;
 using Boilerplate.Features.Core.Commands;
-using ImageMagick;
 using PhotoGalleryService.Features.Worker.Instructions;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 
 namespace PhotoGalleryService.Features.Worker.Commands
 {
@@ -27,14 +28,14 @@ namespace PhotoGalleryService.Features.Worker.Commands
         {
             using (var stream = new MemoryStream())
             {
-                using (var image = new MagickImage(command.Image))
+                using (var image = Image.Load(command.Image, out IImageFormat format))
                 {
                     foreach (var instruction in command.Instructions)
                     {
                         await instruction.ApplyAsync(image);
                     }
 
-                    await image.WriteAsync(stream);
+                    await image.SaveAsJpegAsync(stream);
                 }
 
                 return stream.ToArray();

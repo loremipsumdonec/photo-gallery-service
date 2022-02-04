@@ -1,5 +1,6 @@
-﻿using ImageMagick;
-using PhotoGalleryService.Features.Worker.Attributes;
+﻿using PhotoGalleryService.Features.Worker.Attributes;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace PhotoGalleryService.Features.Worker.Instructions
 {
@@ -7,18 +8,16 @@ namespace PhotoGalleryService.Features.Worker.Instructions
     public class Blur
         : SynchronouslyInstruction
     {
-        private readonly double _radius;
         private readonly double _sigma;
 
-        public Blur(double radius, double sigma) 
+        public Blur(double sigma) 
         { 
-            _radius = radius;
             _sigma = sigma;
         }
 
-        protected override void ApplySynchronously(MagickImage image)
+        protected override void ApplySynchronously(Image image)
         {
-            image.Blur(_radius, _sigma);
+            image.Mutate(i => i.GaussianBlur((float)_sigma));
         }
     }
 }

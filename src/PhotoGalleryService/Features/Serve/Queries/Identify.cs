@@ -1,6 +1,5 @@
 ﻿using Boilerplate.Features.Core;
 using Boilerplate.Features.Core.Queries;
-using ImageMagick;
 
 namespace PhotoGalleryService.Features.Serve.Queries
 {
@@ -30,25 +29,13 @@ namespace PhotoGalleryService.Features.Serve.Queries
         : QueryHandler<Identify>
     {
         public override Task<IModel> ExecuteAsync(Identify query)
-        {
-            var info = new MagickImageInfo(query.Data);
-            
+        {           
             var model = new IdentifyModel()
             {
-                Height = info.Height,
-                Width = info.Width,
-                MIMEType = GetMIMEType(info.Format)
+                MIMEType = "image/jpeg"
             };
 
             return Task.FromResult((IModel) model);
         }
-
-        private string GetMIMEType(MagickFormat format) => format switch
-        {
-            MagickFormat.Png => "image/png",
-            MagickFormat.Jpeg => "image/jpeg",
-            MagickFormat.Cr2 => "image/x-canon-cr2",
-            _ => Enum.GetName(format)
-        };
     }
 }

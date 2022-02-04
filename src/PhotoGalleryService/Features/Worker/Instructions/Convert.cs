@@ -1,5 +1,5 @@
-﻿using ImageMagick;
-using PhotoGalleryService.Features.Worker.Attributes;
+﻿using PhotoGalleryService.Features.Worker.Attributes;
+using SixLabors.ImageSharp;
 
 namespace PhotoGalleryService.Features.Worker.Instructions
 {
@@ -7,16 +7,13 @@ namespace PhotoGalleryService.Features.Worker.Instructions
     public class Convert
         : SynchronouslyInstruction
     {
-        private readonly MagickFormat _format;
 
         public Convert(string format) 
         {
-            _format = Enum.Parse<MagickFormat>(format, true);
         }
 
-        protected override void ApplySynchronously(MagickImage image)
+        protected override void ApplySynchronously(Image image)
         {
-            image.Format = _format;
         }
     }
 }

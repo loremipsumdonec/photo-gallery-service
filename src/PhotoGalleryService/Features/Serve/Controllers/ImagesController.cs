@@ -29,22 +29,6 @@ namespace PhotoGalleryService.Features.Serve.Controllers
             string mimeType = "image/jpg";
 
             List<IInstruction> instructions = new List<IInstruction>();
-
-            switch(extension) 
-            {
-                case "jpg":
-                    instructions.Add(new Worker.Instructions.Convert("jpg"));
-                    break;
-                case "png":
-                    instructions.Add(new Worker.Instructions.Convert("png"));
-                    mimeType = "image/png";
-                    break;
-                case "webp":
-                    instructions.Add(new Worker.Instructions.Convert("webp"));
-                    mimeType = "image/webp";
-                    break;
-            }
-
             instructions.AddRange(apply);
 
             var stream = _storage.Download(imageId);

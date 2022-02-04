@@ -1,9 +1,9 @@
-﻿using ImageMagick;
+﻿using SixLabors.ImageSharp;
 
 namespace PhotoGalleryService.Features.Worker.Instructions
 {
     public interface IInstruction
     {
-        Task ApplyAsync(MagickImage image);
+        Task ApplyAsync(Image image);
     }
 }
