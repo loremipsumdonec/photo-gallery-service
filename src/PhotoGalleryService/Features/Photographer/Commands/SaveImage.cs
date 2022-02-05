@@ -1,8 +1,6 @@
 ﻿using Boilerplate.Features.Core;
 using Boilerplate.Features.Core.Commands;
-using Boilerplate.Features.Core.Queries;
 using PhotoGalleryService.Features.Gallery.Commands;
-using PhotoGalleryService.Features.Serve.Queries;
 using RemotePhotographer.Features.Photographer.Events;
 
 namespace PhotoGalleryService.Features.Photographer.Commands
@@ -24,7 +22,7 @@ namespace PhotoGalleryService.Features.Photographer.Commands
             }
         }
 
-        public SaveImage(PreviewImageCaptured @event)
+        public SaveImage(VideoImageCaptured @event)
         {
             Data = @event.Data;
 

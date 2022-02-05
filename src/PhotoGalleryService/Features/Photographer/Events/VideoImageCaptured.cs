@@ -3,10 +3,10 @@ using Boilerplate.Features.Reactive.Events;
 
 namespace RemotePhotographer.Features.Photographer.Events
 {
-    public class PreviewImageCaptured
+    public class VideoImageCaptured
         : Event, IConsumed
     {
-        public PreviewImageCaptured()
+        public VideoImageCaptured()
         {
         }
 
