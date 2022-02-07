@@ -9,9 +9,10 @@ namespace Boilerplate.Features.ElasticApm.Commands
         private readonly ICommandDispatcher _decorated;
         private readonly ITracer _tracer;
 
-        public ElasticApmCommandDispatcherDecorator(ICommandDispatcher decorated)
+        public ElasticApmCommandDispatcherDecorator(ICommandDispatcher decorated, ITracer tracer)
         {
             _decorated = decorated;
+            _tracer = tracer;
         }
 
         public async Task<bool> DispatchAsync(ICommand command)
