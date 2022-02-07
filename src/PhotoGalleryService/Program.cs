@@ -42,7 +42,7 @@ builder.Services.AddGraphQLServer()
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<EventConsumer<ImageCaptured>>();
-    x.AddConsumer<EventConsumer<PreviewImageCaptured>>();
+    x.AddConsumer<EventConsumer<VideoImageCaptured>>();
 
     x.AddConsumer<QueryConsumer<GetImages>>();
 
