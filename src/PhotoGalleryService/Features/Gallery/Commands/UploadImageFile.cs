@@ -46,20 +46,19 @@ namespace PhotoGalleryService.Features.Gallery.Commands
 
         public override async Task<bool> ExecuteAsync(UploadImageFile command)
         {
-            var image = _storage.Get(command.ImageId);
+            await Task.Run(() => {
 
-            if(image == null) 
-            {
-                throw new ImageNotFoundException($"Could not find image with id {command.ImageId}");
-            }
+                var image = _storage.Get(command.ImageId);
 
-            var metaData = await _queryDispatcher.DispatchAsync<IdentifyModel>(
-                new Identify(command.Data)
-            );
+                if (image == null)
+                {
+                    throw new ImageNotFoundException($"Could not find image with id {command.ImageId}");
+                }
 
-            _fileStorage.Upload(image.ImageId, command.Data);
+                _fileStorage.Upload(image.ImageId, command.Data);
+                _dispatcher.Dispatch(new ImageFileUploaded(image));
 
-            _dispatcher.Dispatch(new ImageFileUploaded(image));
+            });
 
             return true;
         }

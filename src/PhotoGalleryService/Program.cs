@@ -13,9 +13,11 @@ using RemotePhotographer.Features.Photographer.Events;
 using PhotoGalleryService.Features.Worker;
 using MassTransit.MongoDbIntegration.MessageData;
 using PhotoGalleryService.Features.Gallery.Queries;
+using Elastic.Apm.NetCoreAll;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+builder.Host.UseAllElasticApm();
 
 builder.Host.ConfigureContainer((ContainerBuilder containerBuilder) =>
 {
@@ -79,6 +81,7 @@ builder.Services.AddGenericRequestClient();
 var app = builder.Build();
 app.UseRouting();
 app.UseWebSockets();
+app.UseAllElasticApm(builder.Configuration);
 
 app.UseEndpoints(endpoints =>
 {
