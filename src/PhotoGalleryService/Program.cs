@@ -10,10 +10,11 @@ using MassTransit;
 using System.Reflection;
 using Boilerplate.Features.MassTransit;
 using RemotePhotographer.Features.Photographer.Events;
-using PhotoGalleryService.Features.Worker;
+using PhotoGalleryService.Features.ImageSharp;
 using MassTransit.MongoDbIntegration.MessageData;
 using PhotoGalleryService.Features.Gallery.Queries;
 using Elastic.Apm.NetCoreAll;
+using PhotoGalleryService.Features.Magick;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
@@ -30,7 +31,8 @@ builder.Host.ConfigureContainer((ContainerBuilder containerBuilder) =>
     containerBuilder.RegisterModule(new ReactiveModule(builder.Configuration, assemblies));
     containerBuilder.RegisterModule(new MassTransitModule(builder.Configuration, assemblies));
     containerBuilder.RegisterModule(new GalleryModule(builder.Configuration));
-    containerBuilder.RegisterModule(new WorkerModule(builder.Configuration, assemblies));
+    containerBuilder.RegisterModule(new ImageSharpModule(builder.Configuration, assemblies));
+    containerBuilder.RegisterModule(new MagickModule(builder.Configuration, assemblies));
 });
 
 builder.Services.AddControllers();

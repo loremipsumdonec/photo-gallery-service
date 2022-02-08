@@ -1,9 +1,6 @@
 ﻿using Boilerplate.Features.Core.Commands;
 using Microsoft.AspNetCore.Mvc;
 using PhotoGalleryService.Features.Gallery.Services;
-using PhotoGalleryService.Features.Worker.Bindings;
-using PhotoGalleryService.Features.Worker.Commands;
-using PhotoGalleryService.Features.Worker.Instructions;
 
 namespace PhotoGalleryService.Features.Serve.Controllers
 {
@@ -20,15 +17,39 @@ namespace PhotoGalleryService.Features.Serve.Controllers
             _dispatcher = dispatcher;
         }
 
-        [HttpGet, Route("images/{imageId}.{extension}")]
-        public async Task<object> GetImage(
+        [HttpGet, Route("magick/images/{imageId}.{extension}")]
+        public async Task<object> GetImageWithMagick(
             [FromRoute] string imageId,
             [FromRoute] string extension,
-            [ModelBinder(typeof(InstructionsModelBinder))] IEnumerable<IInstruction> apply)
+            [ModelBinder(typeof(Magick.Bindings.InstructionsModelBinder))] IEnumerable<Magick.Instructions.IInstruction> apply)
         {
             string mimeType = "image/jpg";
 
-            List<IInstruction> instructions = new List<IInstruction>();
+            var instructions = new List<Magick.Instructions.IInstruction>();
+            instructions.AddRange(apply);
+
+            var stream = _storage.Download(imageId);
+
+            if (stream == null)
+            {
+                return NotFound($"Could not find image with id {imageId}");
+            }
+
+            var command = new Magick.Commands.ProcessImage(stream, instructions);
+            await _dispatcher.DispatchAsync(command);
+
+            return File((byte[])command.CommandResult.Output, mimeType);
+        }
+
+        [HttpGet, Route("imagesharp/images/{imageId}.{extension}")]
+        public async Task<object> GetImageWithImageSharp(
+            [FromRoute] string imageId,
+            [FromRoute] string extension,
+            [ModelBinder(typeof(ImageSharp.Bindings.InstructionsModelBinder))] IEnumerable<ImageSharp.Instructions.IInstruction> apply)
+        {
+            string mimeType = "image/jpg";
+
+            var instructions = new List<ImageSharp.Instructions.IInstruction>();
             instructions.AddRange(apply);
 
             var stream = _storage.Download(imageId);
@@ -38,7 +59,7 @@ namespace PhotoGalleryService.Features.Serve.Controllers
                 return NotFound($"Could not find image with id {imageId}");
             }
 
-            var command = new ProcessImage(stream, instructions);
+            var command = new ImageSharp.Commands.ProcessImage(stream, instructions);
             await _dispatcher.DispatchAsync(command);
 
             return File((byte[])command.CommandResult.Output, mimeType);
