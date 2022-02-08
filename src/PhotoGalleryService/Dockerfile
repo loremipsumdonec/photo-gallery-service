@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:6.0-alpine
 RUN apk add curl
 RUN \
-curl https://www.imagemagick.org/download/ImageMagick.tar.gz && \
+curl https://download.imagemagick.org/ImageMagick/download/ImageMagick.tar.gz && \
 tar -xzf ImageMagick.tar.gz && \
 cd ImageMagick && \
 ./configure --prefix /usr/local && \
