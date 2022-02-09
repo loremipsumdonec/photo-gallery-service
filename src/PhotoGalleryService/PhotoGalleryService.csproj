@@ -10,6 +10,7 @@
 	<ItemGroup>
 		<PackageReference Include="Autofac" Version="6.3.0" />
 		<PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.2.0" />
+		<PackageReference Include="Elastic.Apm.AspNetCore" Version="1.13.0" />
 		<PackageReference Include="Elastic.Apm.MongoDb" Version="1.13.0" />
 		<PackageReference Include="Elastic.Apm.NetCoreAll" Version="1.13.0" />
 		<PackageReference Include="Elastic.Apm.StackExchange.Redis" Version="1.13.0" />

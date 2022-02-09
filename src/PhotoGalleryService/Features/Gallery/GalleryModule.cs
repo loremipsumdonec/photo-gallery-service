@@ -1,6 +1,7 @@
 ﻿using PhotoGalleryService.Features.Gallery.Services;
 using Autofac;
 using Boilerplate.Features.Core.Config;
+using StackExchange.Redis;
 
 namespace PhotoGalleryService.Features.Gallery
 {
@@ -18,6 +19,8 @@ namespace PhotoGalleryService.Features.Gallery
         {
             ValidateConfiguration();
 
+            RegisterGalleryImageFileStorage(builder);
+
             builder.RegisterFromAs<IImageStorage>(
                 "gallery.image.storage",
                 Configuration
@@ -27,6 +30,24 @@ namespace PhotoGalleryService.Features.Gallery
                 "gallery.image.file.storage",
                 Configuration
             ).InstancePerLifetimeScope();
+        }
+
+        private void RegisterGalleryImageFileStorage(ContainerBuilder builder) 
+        {
+            string hostname = Configuration.GetValue<string>("gallery.image.file.storage:parameters:hostname");
+            int port = Configuration.GetValue<int>("gallery.image.file.storage:parameters:port");
+
+            var l = ConnectionMultiplexer.Connect(new ConfigurationOptions()
+            {
+                AllowAdmin = true,
+                EndPoints = { $"{hostname}:{port}" },
+                ConnectTimeout = 30000,
+                SyncTimeout = 30000
+            });
+
+            builder.RegisterInstance<IConnectionMultiplexer>(l)
+                .Named<IConnectionMultiplexer>("gallery.image.file.storage")
+                .SingleInstance();
         }
 
         private void ValidateConfiguration() 

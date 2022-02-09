@@ -17,10 +17,9 @@ namespace PhotoGalleryService.Features.Serve.Controllers
             _dispatcher = dispatcher;
         }
 
-        [HttpGet, Route("magick/images/{imageId}.{extension}")]
+        [HttpGet, Route("magick/images/{imageId}")]
         public async Task<object> GetImageWithMagick(
             [FromRoute] string imageId,
-            [FromRoute] string extension,
             [ModelBinder(typeof(Magick.Bindings.InstructionsModelBinder))] IEnumerable<Magick.Instructions.IInstruction> apply)
         {
             string mimeType = "image/jpg";
@@ -41,10 +40,9 @@ namespace PhotoGalleryService.Features.Serve.Controllers
             return File((byte[])command.CommandResult.Output, mimeType);
         }
 
-        [HttpGet, Route("imagesharp/images/{imageId}.{extension}")]
+        [HttpGet, Route("imagesharp/images/{imageId}")]
         public async Task<object> GetImageWithImageSharp(
             [FromRoute] string imageId,
-            [FromRoute] string extension,
             [ModelBinder(typeof(ImageSharp.Bindings.InstructionsModelBinder))] IEnumerable<ImageSharp.Instructions.IInstruction> apply)
         {
             string mimeType = "image/jpg";

@@ -1,4 +1,5 @@
-﻿using StackExchange.Redis;
+﻿using Elastic.Apm.StackExchange.Redis;
+using StackExchange.Redis;
 
 namespace PhotoGalleryService.Features.Gallery.Services
 {
@@ -16,6 +17,8 @@ namespace PhotoGalleryService.Features.Gallery.Services
                 ConnectTimeout = 30000,
                 SyncTimeout = 30000
             });
+
+            _redis.UseElasticApm();
         }
 
         public void Clear()
