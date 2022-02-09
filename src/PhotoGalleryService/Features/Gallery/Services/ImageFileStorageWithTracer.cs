@@ -16,22 +16,22 @@ namespace PhotoGalleryService.Features.Gallery.Services
 
         public void Clear()
         {
-            _tracer.CurrentTransaction.CaptureSpan("Clear", "storage", _decorated.Clear);
+            _tracer.CurrentTransaction.CaptureSpan("IImageFileStorage/Clear", "storage", _decorated.Clear);
         }
 
         public void Delete(string imageId)
         {
-            _tracer.CurrentTransaction.CaptureSpan("Delete", "storage", () => _decorated.Delete(imageId));
+            _tracer.CurrentTransaction.CaptureSpan("IImageFileStorage/Delete", "storage", () => _decorated.Delete(imageId));
         }
 
         public byte[] Download(string imageId)
         {
-            return _tracer.CurrentTransaction.CaptureSpan("Download", "storage", () => _decorated.Download(imageId));
+            return _tracer.CurrentTransaction.CaptureSpan("IImageFileStorage/Download", "storage", () => _decorated.Download(imageId));
         }
 
         public void Upload(string imageId, byte[] data)
         {
-            _tracer.CurrentTransaction.CaptureSpan("Upload", "storage", () => _decorated.Upload(imageId, data));
+            _tracer.CurrentTransaction.CaptureSpan("IImageFileStorage/Upload", "storage", () => _decorated.Upload(imageId, data));
         }
     }
 }
